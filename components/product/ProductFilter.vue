@@ -1,11 +1,11 @@
 <script setup>
-const categoryList = ref([
-  { id: 1, name: "Accessories & stainless" },
-  { id: 2, name: "Musical instruments" },
-  { id: 3, name: "Leather products" },
-  { id: 4, name: "Occasion Gifts" },
-  { id: 5, name: "Silver" },
-]);
+// 👉 props
+const props = defineProps({
+  categories: Array,
+});
+// 👉 Emits
+const emit = defineEmits(["getProducts"]);
+const selectedSubCategory = ref(null);
 const priceRange = ref([20, 80]);
 const priceList = ref([
   { name: "All prices" },
@@ -19,6 +19,9 @@ const colorList = ref([
   { hex: "#FBBC05", name: "yellow" },
 ]);
 const selectedColor = ref("#B1B5B8");
+const getProducts = () => {
+  emit("getProducts", { sub_category_id: selectedSubCategory.value });
+};
 </script>
 <template>
   <div class="flex flex-col gap-3">
@@ -26,7 +29,7 @@ const selectedColor = ref("#B1B5B8");
       <p class="text-black text-lg font-bold">Category</p>
       <Accordion :value="[]" multiple>
         <AccordionPanel
-          v-for="category in categoryList"
+          v-for="category in categories"
           :key="category.id"
           :value="category.id"
           pt:root:class="border-none mb-3"
@@ -34,18 +37,22 @@ const selectedColor = ref("#B1B5B8");
           <AccordionHeader
             pt:root:class="border-2 border-border-color rounded-xl text-base font-medium text-main-color p-4"
             pt:toggleicon:class="text-main-color"
-            >{{ category.name }}</AccordionHeader
+            >{{ category.title }}</AccordionHeader
           >
-          <AccordionContent>
-            <p class="mt-3">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </p>
+          <AccordionContent v-if="category.sub_categories">
+            <div
+              v-for="subCategory of category.sub_categories"
+              :key="subCategory.id"
+              class="mt-3 flex items-center gap-2 price-filter"
+            >
+              <RadioButton
+                v-model="selectedSubCategory"
+                name="dynamic"
+                :value="subCategory.id"
+                @change="getProducts"
+              />
+              <label>{{ subCategory.title }}</label>
+            </div>
           </AccordionContent>
         </AccordionPanel>
       </Accordion>
@@ -64,8 +71,8 @@ const selectedColor = ref("#B1B5B8");
         pt:starthandler:class="border-2 border-second-color before:w-full before:h-full"
       />
       <div class="flex gap-3">
-        <InputNumber v-model="priceRange[0]" fluid/>
-        <InputNumber v-model="priceRange[1]" fluid/>
+        <InputNumber v-model="priceRange[0]" fluid />
+        <InputNumber v-model="priceRange[1]" fluid />
       </div>
       <div class="flex flex-col gap-3">
         <div

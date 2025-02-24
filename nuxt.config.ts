@@ -7,7 +7,7 @@ export default defineNuxtConfig({
   ssr: true,
   runtimeConfig: {
     public: {
-      baseURL: process.env.BASE_URL || "http://127.0.0.1:8000",
+      baseURL: process.env.BASE_URL || "http://localhost:8000",
     },
   },
   modules: [

@@ -1,13 +1,19 @@
 <script lang="ts" setup>
+// 👉 props
+const props = defineProps(["payload"]);
+// 👉 Emits
+const emit = defineEmits(["changeForm"]);
 // 👉 Data
 const initialValues = ref({
   password: "",
   confirmPassword: "",
 });
-
-// 👉 Functions
+const auth = useAuthStore();
+const isLoading = useLoadingState();
+const { $toast } = useNuxtApp();
+// 👉 Methods
 const resolver = ({ values }: any) => {
-  const errors: any = {confirmPassword: []};
+  const errors: any = { confirmPassword: [] };
 
   if (!values.password) {
     errors.password = [{ message: "password is required." }];
@@ -22,14 +28,27 @@ const resolver = ({ values }: any) => {
     errors,
   };
 };
-const onFormSubmit = ({ valid }: any) => {
-  if (valid) {
-    console.log("valid");
+const onFormSubmit = async (event: any) => {
+  if (event.valid) {
+    isLoading.value = true;
+    const res = await auth.resetPassword({
+      email: props.payload.email,
+      code: props.payload.code,
+      password: event.states.password.value,
+      password_confirmation: event.states.confirmPassword.value,
+    });
+    if (res.status == "fail") {
+      $toast.error(res.message);
+    } else {
+      $toast.success(res.message);
+      emit("changeForm", "signIn", null);
+    }
+    isLoading.value = false;
   }
 };
 </script>
 <template>
- <AuthCardForm>
+  <AuthCardForm>
     <template #header>
       <h3 class="text-4xl font-bold text-main-color">Reset your password</h3>
     </template>
@@ -95,7 +114,7 @@ const onFormSubmit = ({ valid }: any) => {
           label="Sign in"
           variant="text"
           class="text-second-color text-sm font-medium hover:bg-inherit p-0"
-          @click="$emit('changeForm', 'signIn')"
+          @click="$emit('changeForm', 'signIn', null)"
         />
       </p>
     </template>

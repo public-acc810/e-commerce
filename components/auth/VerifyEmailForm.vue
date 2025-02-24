@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-// 👉 Emits
-const emit = defineEmits(["changeForm"]);
 // 👉 Data
 const emailFormActive = ref(true);
 const email = ref("");
@@ -10,13 +8,14 @@ const auth = useAuthStore();
 const isLoading = useLoadingState();
 const { $toast } = useNuxtApp();
 // 👉 Methods
+
 const onEmailFormSubmit = async () => {
   if (!email.value) {
     errors.value = { email: { message: "email is required." } };
     return;
   } else {
     isLoading.value = true;
-    const res = await auth.forgetPassword({
+    const res = await auth.sendCode({
       email: email.value,
     });
     if (res.status == "fail") {
@@ -32,17 +31,13 @@ const onCodeFormSubmit = async () => {
   } else {
     errors.value = { code: {} };
     isLoading.value = true;
-    const res = await auth.checkCode({
+    const res = await auth.verifyEmail({
       code: code.value,
       email: email.value,
     });
     if (res.status == "fail") {
       $toast.error(res.message);
-    } else
-      emit("changeForm", "resetPassword", {
-        code: code.value,
-        email: email.value,
-      });
+    }
     isLoading.value = false;
   }
 };
@@ -50,9 +45,9 @@ const onCodeFormSubmit = async () => {
 <template>
   <AuthCardForm>
     <template #header>
-      <h3 class="text-4xl font-bold text-main-color">Forget password ?</h3>
+      <h3 class="text-4xl font-bold text-main-color">Verify email</h3>
       <p class="text-main-color text-center">
-        Enter your email to send you a message to recover your password easily.
+        Enter your email to send you a message to verify your email
       </p>
     </template>
     <template #content>
@@ -105,7 +100,7 @@ const onCodeFormSubmit = async () => {
         </div>
         <UiButtonComponent
           class="auth-button"
-          content="Reset my password"
+          content="Verify email"
           @click.prevent="onCodeFormSubmit"
         />
       </form>

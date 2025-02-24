@@ -1,5 +1,5 @@
 <script setup>
-import { Navigation } from "swiper/modules";
+import { Navigation ,FreeMode} from "swiper/modules";
 
 const props = defineProps({
   subtitle: String,
@@ -41,11 +41,12 @@ const navigationOptions = ref({
       </div>
     </div>
     <Swiper
-      :modules="[Navigation]"
+      :modules="[Navigation,FreeMode]"
       :slidesPerView="slidesPerView"
       :space-between="spaceBetween"
       :class="['w-full', className]"
       :navigation="navigationOptions"
+      :freeMode="true"
     >
       <swiper-slide v-for="(item, index) in items" :key="index">
         <slot :item="item" :index="index"></slot>

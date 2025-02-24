@@ -1,34 +1,32 @@
 <script setup lang="ts">
+definePageMeta({
+  middleware: "auth",
+});
 // 👉 Data
+const auth = useAuthStore();
+const globalStore = useGlobalStore();
+const countries = globalStore.countries;
 const initialValues = ref({
-  firstName: "",
-  lastName: "",
+  first_name: "",
+  last_name: "",
   email: "",
+  phone_code: countries[0].phone_code,
   phone: "",
   address: "",
   password: "",
-  confirmPassword: "",
+  password_confirmation: "",
 });
 const termsCheck = ref(false);
-const selectedCity = ref(null);
-const cities = ref([
-  { name: "New York", code: "NY" },
-  { name: "Rome", code: "RM" },
-  { name: "London", code: "LDN" },
-  { name: "Istanbul", code: "IST" },
-  { name: "Paris", code: "PRS" },
-]);
-const auth = useAuthStore();
 const isLoading = useLoadingState();
 const { $toast } = useNuxtApp();
 // 👉 Functions
 const resolver = ({ values }: any) => {
-  const errors: any = { confirmPassword: [] };
-  if (!values.firstName) {
-    errors.firstName = [{ message: "please enter your first name." }];
+  const errors: any = { password_confirmation: [] };
+  if (!values.first_name) {
+    errors.first_name = [{ message: "please enter your first name." }];
   }
-  if (!values.lastName) {
-    errors.lastName = [{ message: "please enter your first name." }];
+  if (!values.last_name) {
+    errors.last_name = [{ message: "please enter your first name." }];
   }
   if (!values.email) {
     errors.email = [{ message: "please enter your email." }];
@@ -42,11 +40,15 @@ const resolver = ({ values }: any) => {
   if (!values.password) {
     errors.password = [{ message: "please enter your password." }];
   }
-  if (!values.confirmPassword) {
-    errors.confirmPassword = [{ message: "please confirm your password." }];
+  if (!values.password_confirmation) {
+    errors.password_confirmation = [
+      { message: "please confirm your password." },
+    ];
   }
-  if (values.password && values.password !== values.confirmPassword) {
-    errors.confirmPassword = [{ message: "your passwords are not identical" }];
+  if (values.password && values.password !== values.password_confirmation) {
+    errors.password_confirmation = [
+      { message: "your passwords are not identical" },
+    ];
   }
   return {
     errors,
@@ -56,10 +58,17 @@ const onFormSubmit = async (event: any) => {
   if (event.valid) {
     isLoading.value = true;
     const res = await auth.register({
-      ...event.states,
+      first_name: event.states.first_name.value,
+      last_name: event.states.last_name.value,
+      email: event.states.email.value,
+      phone_code: event.states.phone_code.value,
+      phone: event.states.phone.value,
+      address: event.states.address.value,
+      password: event.states.password.value,
+      password_confirmation: event.states.password_confirmation.value,
     });
-    if (res) {
-      $toast.error(res.value.data.message);
+    if (res.status == "fail") {
+      $toast.error(res.message);
     }
     isLoading.value = false;
   }
@@ -86,33 +95,33 @@ const onFormSubmit = async (event: any) => {
             <div class="flex flex-col gap-1">
               <label>First Name*</label>
               <InputText
-                name="firstName"
+                name="first_name"
                 type="text"
                 placeholder="Enter Your first name"
                 fluid
               />
               <Message
-                v-if="$form.firstName?.invalid"
+                v-if="$form.first_name?.invalid"
                 severity="error"
                 size="small"
                 variant="simple"
-                >{{ $form.firstName.error.message }}</Message
+                >{{ $form.first_name.error.message }}</Message
               >
             </div>
             <div class="flex flex-col gap-1">
               <label>Last Name*</label>
               <InputText
-                name="lastName"
+                name="last_name"
                 type="text"
                 placeholder="Enter Your last name"
                 fluid
               />
               <Message
-                v-if="$form.lastName?.invalid"
+                v-if="$form.last_name?.invalid"
                 severity="error"
                 size="small"
                 variant="simple"
-                >{{ $form.lastName.error.message }}</Message
+                >{{ $form.last_name.error.message }}</Message
               >
             </div>
           </div>
@@ -130,6 +139,45 @@ const onFormSubmit = async (event: any) => {
               size="small"
               variant="simple"
               >{{ $form.email.error.message }}</Message
+            >
+          </div>
+          <div class="flex flex-col gap-1">
+            <label>Phone number*</label>
+            <InputGroup>
+              <InputGroupAddon
+                :class="{ 'p-invalid': $form.phone?.invalid }"
+                class="p-0 border-r-0 rounded-xl border-border-color"
+              >
+                <Select
+                  name="phone_code"
+                  :options="countries"
+                  optionLabel="phone_code"
+                  optionValue="phone_code"
+                  class="border-none pr-0"
+                  pt:label:class="p-0"
+                  pt:dropdownicon:class="text-black"
+                />
+                <Divider
+                  layout="vertical"
+                  class="before:border-black ml-0"
+                  style="min-height: 50%"
+                />
+              </InputGroupAddon>
+              <InputText
+                name="phone"
+                type="text"
+                v-keyfilter.num
+                placeholder="Enter Your phone"
+                class="border-l-0 rounded-xl"
+                fluid
+              />
+            </InputGroup>
+            <Message
+              v-if="$form.phone?.invalid"
+              severity="error"
+              size="small"
+              variant="simple"
+              >{{ $form.phone.error.message }}</Message
             >
           </div>
           <div class="flex flex-col gap-1">
@@ -172,7 +220,7 @@ const onFormSubmit = async (event: any) => {
             <label>Confirm Password*</label>
             <Password
               type="text"
-              name="confirmPassword"
+              name="password_confirmation"
               placeholder="Confirm your password"
               :feedback="false"
               toggleMask
@@ -180,11 +228,11 @@ const onFormSubmit = async (event: any) => {
               pt:root:class="password-container"
             />
             <Message
-              v-if="$form.confirmPassword?.invalid"
+              v-if="$form.password_confirmation?.invalid"
               severity="error"
               size="small"
               variant="simple"
-              >{{ $form.confirmPassword.error.message }}</Message
+              >{{ $form.password_confirmation.error.message }}</Message
             >
           </div>
           <div class="flex justify-start gap-2">
@@ -212,7 +260,7 @@ const onFormSubmit = async (event: any) => {
       <template #footer>
         <p class="text-main-color text-sm font-medium mt-2">
           Already have an account?
-          <NuxtLink class="text-second-color" to="/auth/signIn">
+          <NuxtLink class="text-second-color" to="/auth/sign-in">
             Sign in</NuxtLink
           >
         </p>

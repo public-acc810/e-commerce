@@ -8,16 +8,6 @@
 }
 
 :deep(.p-inputtext) {
-    border-radius: 12px;
-    box-shadow: none;
-    border-color: $border-color;
     border-width: 2px;
     padding: 14px 16px;
-    &:hover,
-    &:focus {
-        border-color: inherit !important;
-    }
-    &:not(.p-disabled).p-focus {
-        border-color: inherit;
-    }
 }

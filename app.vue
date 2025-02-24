@@ -4,6 +4,7 @@ const isLoading = useLoadingState();
 <template>
   <div>
     <NuxtRouteAnnouncer />
+    <ConfirmDialog></ConfirmDialog>
     <UiLoadingBlock :blocked="isLoading" />
     <NuxtLoadingIndicator
       :height="5"

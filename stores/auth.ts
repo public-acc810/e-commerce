@@ -8,32 +8,84 @@ export const useAuthStore = defineStore({
     isAuth: false,
   }),
   actions: {
-    // Login
+    //👉 Login
     async login(credentials: {
       email: string;
       password: string;
     }): Promise<any> {
-      const { data, error }: any = await useAPI("login", {
+      const { $api }: any = useNuxtApp();
+      const res: any = await $api("login", {
         method: "POST",
         body: { ...credentials },
+        ignoreResponseError: true,
       });
-      if (error.value) return error;
-      else {
-        this.redirectToProfile(data.value.data);
-        return false;
-      }
+      if (res.status == "success") this.getProfile(res.data.token);
+      return res;
     },
-    // register
-    async register(credentials: IUser): Promise<any> {
-      const { data, error }: any = await useAPI("register", {
+    //👉 send code to verify
+    async sendCode(credentials: { email: string }): Promise<any> {
+      const { $api }: any = useNuxtApp();
+      const res: any = await $api("resend-code", {
         method: "POST",
         body: { ...credentials },
+        ignoreResponseError: true,
       });
-      if (error.value) return error;
-      else {
-        this.redirectToProfile(data.value.data);
-        return false;
-      }
+      return res;
+    },
+    //👉 verify email
+    async verifyEmail(credentials: { code: string; email: string }) {
+      const { $api }: any = useNuxtApp();
+      const res: any = await $api("account-verify", {
+        method: "POST",
+        body: { ...credentials },
+        ignoreResponseError: true,
+      });
+      if (res.status == "success") this.getProfile(res.data.token);
+      return res;
+    },
+    //👉 forget password
+    async forgetPassword(credentials: { email: string }): Promise<any> {
+      const { $api }: any = useNuxtApp();
+      const res: any = await $api("forget-password", {
+        method: "POST",
+        body: { ...credentials },
+        ignoreResponseError: true,
+      });
+      return res;
+    },
+    //👉 check code for reset
+    async checkCode(credentials: {
+      code: string;
+      email: string;
+    }): Promise<any> {
+      const { $api }: any = useNuxtApp();
+      const res: any = await $api("check-code", {
+        method: "POST",
+        body: { ...credentials },
+        ignoreResponseError: true,
+      });
+      return res;
+    },
+    //👉 reset password
+    async resetPassword(credentials: any): Promise<any> {
+      const { $api }: any = useNuxtApp();
+      const res: any = await $api("reset-password", {
+        method: "POST",
+        body: { ...credentials },
+        ignoreResponseError: true,
+      });
+      return res;
+    },
+    //👉 register
+    async register(credentials: IUser): Promise<any> {
+      const { $api }: any = useNuxtApp();
+      const res: any = await $api("register", {
+        method: "POST",
+        body: { ...credentials },
+        ignoreResponseError: true,
+      });
+      if (res.status == "success") navigateTo("/auth/sign-in");
+      return res;
     },
     // logout
     async logout() {
@@ -41,17 +93,30 @@ export const useAuthStore = defineStore({
       this.user = null;
       this.isAuth = false;
       await localStorage.clear();
-      navigateTo("/auth/signin");
+      navigateTo("/auth/sign-in");
     },
-    // Redirect to profile
-    async redirectToProfile(data: any) {
-      // const cartStore = useCartStore();
-      // cartStore.getCartItems();
-      this.user = await data;
-      this.token = this.user.token;
-      this.isAuth = true;
+    //👉 get profile
+    async getProfile(token: String) {
+      this.token = token;
       useLocalStorage("token", this.token);
-      navigateTo("/");
+      const { $api }: any = useNuxtApp();
+      const res: any = await $api("profile", { ignoreResponseError: true });
+      this.user = await res.data;
+      this.isAuth = true;
+      navigateTo("/account");
+    },
+    //👉 update profile
+    async updateProfile(credentials: any) {
+      const { $api }: any = useNuxtApp();
+      const res: any = await $api("profile/update", {
+        method: "POST",
+        body: {
+          ...credentials,
+        },
+        ignoreResponseError: true,
+      });
+      if (res.status == "success") this.user = res.data;
+      return res;
     },
   },
   persist: true,

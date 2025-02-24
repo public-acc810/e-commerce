@@ -7,14 +7,19 @@
     .p-inputtext,
     .p-textarea,
     .p-select {
-        border-radius: 12px;
-        box-shadow: none;
         padding: 14px 16px;
-        &:focus {
-            border-color: $main-color;
+    }
+    .p-inputgroup {
+        .p-inputgroupaddon {
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            &.p-invalid {
+                border-color: coral !important;
+            }
         }
-        &:not(.p-invalid) {
-            border-color: $border-color;
+        .p-inputtext {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
         }
     }
     .otp-container {

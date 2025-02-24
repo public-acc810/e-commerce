@@ -7,7 +7,9 @@ const initialValues = ref({
 const auth = useAuthStore();
 const isLoading = useLoadingState();
 const { $toast } = useNuxtApp();
-// 👉 Functions
+// 👉 Emits
+const emit = defineEmits(["changeForm"]);
+// 👉 Methods
 const resolver = ({ values }: any) => {
   const errors: any = {};
 
@@ -29,8 +31,10 @@ const onFormSubmit = async (event: any) => {
       email: event.states.email.value,
       password: event.states.password.value,
     });
-    if (res) {
-      $toast.error(res.value.data.message);
+    if (res.status == "fail") {
+      if (res.hasOwnProperty("is_verify") && !res.is_verify)
+        emit("changeForm", "verifyEmail", null);
+      else $toast.error(res.message);
     }
     isLoading.value = false;
   }
@@ -94,7 +98,7 @@ const onFormSubmit = async (event: any) => {
             label="Forget password ?"
             variant="text"
             class="text-second-color text-sm font-normal hover:bg-inherit p-0"
-            @click="$emit('changeForm', 'forgetPassword')"
+            @click="$emit('changeForm', 'forgetPassword',null)"
           />
         </div>
         <UiButtonComponent
@@ -107,7 +111,7 @@ const onFormSubmit = async (event: any) => {
     <template #footer>
       <p class="text-main-color text-sm font-medium mt-2">
         Don’t have an account ?
-        <NuxtLink class="text-second-color" to="/auth/signUp">
+        <NuxtLink class="text-second-color" to="/auth/sign-up">
           Sign up</NuxtLink
         >
       </p>

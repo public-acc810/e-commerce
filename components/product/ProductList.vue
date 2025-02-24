@@ -1,24 +1,31 @@
 <script setup>
-// 👉 Data
+// 👉 Props
 const props = defineProps(["products"]);
-const searchProduct = ref("");
+// 👉 Emits
+const emit = defineEmits(["getProducts"]);
+// 👉 Data
+const keyword = ref("");
 const selectedSort = ref(null);
-const options = ref([
-  { name: "Relevance" },
-  { name: "Price: Low to High" },
-  { name: "Price: High to Low" },
-  { name: "Date: New to Old" },
-  { name: "Date: Old to New" },
+const sortedOptions = ref([
+  { name: "Best Seller", value: "best_seller" },
+  { name: "Price: Low to High", value: "price_low_to_high" },
+  { name: "Price: High to Low", value: "price_high_to_low" },
+  { name: "Top Rate", value: "top_rate" },
 ]);
+// 👉 Methods
+const fireGetProducts = () => {
+  emit("getProducts", { keyword: keyword.value, sorted: selectedSort.value });
+};
 </script>
 <template>
   <div class="flex flex-col gap-6">
     <div class="flex justify-between">
       <IconField class="basis-5/12">
         <InputText
-          v-model="searchProduct"
+          v-model="keyword"
           placeholder="Search for anything..."
           class="py-3 px-4 text-sm font-medium w-full"
+          @input="fireGetProducts"
         />
         <InputIcon class="pi pi-search text-main-color cursor-pointer" />
       </IconField>
@@ -26,18 +33,20 @@ const options = ref([
         <label class="text-sm font-medium whitespace-nowrap">Sort by :</label>
         <Select
           v-model="selectedSort"
-          :options="options"
+          :options="sortedOptions"
           optionLabel="name"
+          optionValue="value"
           placeholder="Select..."
           class="w-full"
           :checkmark="true"
           pt:option:class="sort-option"
           pt:optionlabel:class="text-sm font-medium text-main-color"
+          @change="fireGetProducts"
         >
         </Select>
       </div>
     </div>
-    <DataView :value="products" layout="grid">
+    <DataView v-if="products" :value="products" layout="grid">
       <template #grid="{ items }">
         <div class="grid grid-cols-12 gap-6">
           <div
@@ -45,10 +54,11 @@ const options = ref([
             :key="index"
             class="md:col-span-4"
           >
-            <ProductCard/>
+            <ProductCard :product="item" />
           </div>
         </div>
       </template>
+      <template #empty> There is no products </template>
     </DataView>
   </div>
 </template>

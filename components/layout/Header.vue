@@ -1,39 +1,50 @@
 <script setup lang="ts">
 // 👉 Data
+const auth = useAuthStore();
+const { $confirmDialog }: any = useNuxtApp();
 const selectedLang = ref("English");
 const languages = ref([{ name: "English" }, { name: "Arabic" }]);
-const toolbarItems = [
-  { name: "Home", link: "/" },
-  { name: "Products", link: "/products" },
-  { name: "Pre-made boxes", link: "/home" },
-  { name: "Build a box", link: "/home" },
+const menuItems = [
+  { label: "Home", link: "/" },
+  { label: "Products", link: "/products" },
 ];
 const searchWord = ref("");
 const menu = ref();
 const accountItems = ref([
-  { label: "Account Details" },
+  { label: "Account Details", route: "/account" },
   { separator: true },
-  { label: "product Review" },
+  { label: "product Review", route: "/account/product-review" },
   { separator: true },
-  { label: "order History" },
+  { label: "order History", route: "/account/order-history" },
   { separator: true },
-  { label: "Addresses" },
+  { label: "Addresses", route: "/account/shipping-address" },
   { separator: true },
-  { label: "Saved Cards" },
+  { label: "Saved Cards", route: "/account/saved-cards" },
   { separator: true },
   {
     label: "Logout",
     command: () => {
-      auth.logout();
+      logout();
     },
   },
 ]);
-const auth = useAuthStore();
-// 👉 Functions
+// 👉 Methods
 const toggle = (event: any) => {
+  console.log(auth.isAuth);
   if (auth.isAuth) {
     menu.value.toggle(event);
-  } else navigateTo("/auth/signin");
+  } else navigateTo("/auth/sign-in");
+};
+const logout = () => {
+  $confirmDialog({
+    header: "Logout",
+    message: " Are you sure you want to log out?",
+    acceptLabel: "Logout",
+    rejectLabel: "Cancel",
+    accept: () => {
+      auth.logout();
+    },
+  });
 };
 </script>
 <template>
@@ -55,30 +66,24 @@ const toggle = (event: any) => {
   </div>
   <!-- -------------------------header container ------------------------- -->
   <div class="header-container">
-    <Toolbar
-      pt:root:class="toolbar-container px-0 border-none	"
-      pt:start:class="gap-2"
-      pt:center:class="gap-6"
+    <Menubar
+      :model="menuItems"
+      pt:root:class="menubar-container px-0 py-4 border-none"
     >
       <template #start>
-        <img alt="logo" src="/logo/coloredLogo.png" class="h-10" />
-        <img alt="turkish" src="/logo/coloredTurkish.png" class="h-6" />
+        <NuxtLink to="/" class="flex gap-2 items-center">
+          <img alt="logo" src="/logo/coloredLogo.png" class="h-10" />
+          <img alt="turkish" src="/logo/coloredTurkish.png" class="h-6" />
+        </NuxtLink>
       </template>
-
-      <template #center>
-        <NuxtLink
-          v-for="item in toolbarItems"
-          :key="item.name"
-          :to="item.link"
-          class="text-sm font-medium"
-          >{{ item.name }}</NuxtLink
-        >
+      <template #item="{ item }">
+        <NuxtLink :to="item.link" class="text-sm font-medium">{{
+          item.label
+        }}</NuxtLink>
       </template>
-
       <template #end>
         <Inplace pt:display:class="p-0 hover:bg-inherit">
           <template #display>
-            <!-- <Button type="button" icon="pi pi-search" variant="text" rounded /> -->
             <i class="pi pi-search header-icons rounded-full cursor-pointer" />
           </template>
           <template #content="{ closeCallback }">
@@ -86,7 +91,8 @@ const toggle = (event: any) => {
               <InputText
                 v-model="searchWord"
                 placeholder="What are you looking for ?"
-                class="py-3 text-xs bg-[#F5F5F5] border-none min-w-[250px] w-full"
+                class="p-3 text-xs bg-[#F5F5F5] border-none min-w-[250px] w-full"
+                style="border-radius: 4px !important"
               />
               <InputIcon
                 class="pi pi-search text-main-color cursor-pointer"
@@ -98,7 +104,7 @@ const toggle = (event: any) => {
         <NuxtLink to="/wishlist" class="header-icons rounded-full">
           <i class="pi pi-heart" />
         </NuxtLink>
-        <NuxtLink to="/shoppingcart" class="header-icons rounded-full">
+        <NuxtLink to="/shopping-cart" class="header-icons rounded-full">
           <i class="pi pi-shopping-bag" />
         </NuxtLink>
         <i
@@ -113,11 +119,25 @@ const toggle = (event: any) => {
           :model="accountItems"
           :popup="true"
           pt:root:class="account-menu"
-          pt:itemlabel:class="text-sm"
-        />
+        >
+          <template #item="{ item, props }">
+            <NuxtLink
+              v-if="item.route"
+              :to="item.route"
+              v-slot="{ href, navigate }"
+              v-bind="props"
+              custom
+            >
+              <a v-bind="props.action" :href="href" @click="navigate">
+                {{ item.label }}
+              </a>
+            </NuxtLink>
+            <a v-else v-bind="props.action">{{ item.label }}</a>
+          </template>
+        </Menu>
       </template>
-    </Toolbar>
+    </Menubar>
   </div>
   <Divider class="m-0" />
 </template>
-<style lang="scss" src="@/assets/scss/components/layouts/header.scss" scoped />
+<style lang="scss" src="@/assets/scss/components/layouts/header.scss" />

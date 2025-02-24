@@ -6,5 +6,5 @@ export interface IUser{
     phone: string;
     address: string;
     password:String;
-    confirm_password: String 
+    password_confirmation: String 
   }
