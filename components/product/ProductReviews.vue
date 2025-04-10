@@ -26,7 +26,7 @@ const rates = ref([
         </p>
       </div>
       <div class="rate-detailes flex flex-col gap-6 basis-7/12">
-        <diV
+        <div
           class="individual-rate flex items-center gap-4"
           v-for="rate in rates"
           :key="rate.rate"
@@ -47,7 +47,7 @@ const rates = ref([
             {{ rate.progress }}%
             <span class="font-normal text-font-color"> {{ rate.value }}</span>
           </p>
-        </diV>
+        </div>
       </div>
     </div>
     <ProductCustomerFeedback />

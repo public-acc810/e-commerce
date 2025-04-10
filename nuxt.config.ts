@@ -46,7 +46,7 @@ export default defineNuxtConfig({
   fontawesome: {
     icons: {
       brands: ["facebook-f"],
-      solid: ["ruler-horizontal", "circle-check"],
+      solid: ["ruler-horizontal", "circle-check","quote-left"],
     },
   },
   pinia: {

@@ -1,5 +1,5 @@
 <script setup>
-import { Navigation ,FreeMode} from "swiper/modules";
+import { Navigation, FreeMode } from "swiper/modules";
 
 const props = defineProps({
   subtitle: String,
@@ -15,12 +15,14 @@ const navigationOptions = ref({
 });
 </script>
 <template>
-  <div class="related-product-container flex flex-col gap-5 pt-20">
-    <p
-      class="before:bg-second-color before:absolute before:w-4 before:h-9 before:rounded before:-left-7 before:top-1/2 before:-translate-y-1/2 relative text-base font-bold text-second-color"
-    >
-      {{ title }}
-    </p>
+  <div class="main-swiper-container flex flex-col gap-5 pt-20">
+    <div class="relative">
+      <p
+        class="before:bg-second-color before:absolute before:w-4 before:h-9 before:rounded before:-left-0 before:top-1/2 before:-translate-y-1/2 text-base font-bold text-second-color pl-7"
+      >
+        {{ title }}
+      </p>
+    </div>
     <div class="flex justify-between">
       <h3 class="text-4xl font-bold text-main-color">{{ subtitle }}</h3>
       <div class="navigation-container flex gap-2">
@@ -41,12 +43,13 @@ const navigationOptions = ref({
       </div>
     </div>
     <Swiper
-      :modules="[Navigation,FreeMode]"
+      :modules="[Navigation, FreeMode]"
       :slidesPerView="slidesPerView"
       :space-between="spaceBetween"
       :class="['w-full', className]"
       :navigation="navigationOptions"
       :freeMode="true"
+      v-bind="$attrs"
     >
       <swiper-slide v-for="(item, index) in items" :key="index">
         <slot :item="item" :index="index"></slot>

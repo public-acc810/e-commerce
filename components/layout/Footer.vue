@@ -1,12 +1,22 @@
 <script setup lang="ts">
-const productItems = ref([
-  { name: "Accessories & stainless", link: "/" },
-  { name: "Musical instruments", link: "/" },
-  { name: "Leather products", link: "/" },
-  { name: "Occasion Gifts", link: "/" },
-  { name: "Silver", link: "/" },
-  { name: "Sunglasses", link: "/" },
-]);
+const { $api } = useNuxtApp();
+// 👉 Fetch
+// fetch categories
+const { data: categories }: any = await useAsyncData("categories", async () => {
+  if (!import.meta.client) return null;
+  return await $api("categories");
+});
+const productItems = computed(() => {
+  if (categories.value) {
+    return categories.value.data.map((category: any) => {
+      return {
+        name: category.title,
+        link: `/products?categoryId=${category.id}`,
+      };
+    });
+  }
+});
+// 👉 Data
 const serviceItems = ref([
   { name: "Make a request", link: "/make-request" },
   { name: "Track your order", link: "/track-order" },

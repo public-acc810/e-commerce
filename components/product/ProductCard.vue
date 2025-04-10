@@ -7,7 +7,6 @@ const props = defineProps({
 const goToProduct = () => {
   navigateTo(`/products/${props.product.id}`);
 }
-console.log(props.product);
 </script>
 <template>
   <Card
@@ -24,10 +23,10 @@ console.log(props.product);
         class="w-full rounded-t-xl"
         style="height: 308px;"
       />
-      <Tag
+      <!-- <Tag
         pt:root:class="absolute top-0 left-0 py-2 px-4 rounded-tl-xl  rounded-tr-none rounded-bl-none rounded-br-xl bg-second-color text-white"
         >New</Tag
-      >
+      > -->
     </template>
     <template #content>
       <div class="flex flex-col justify-start gap-2">

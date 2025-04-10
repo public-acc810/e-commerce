@@ -10,7 +10,10 @@ const { data: product } = await useAsyncData("product", () =>
   <div class="single-product-container flex flex-col" v-if="product">
     <ProductDetails :product="product.data" />
     <ProductTabs :product="product.data" />
-    <!-- <ProductRelated /> -->
+    <ProductRelated
+      v-if="product.data.related_products.length > 0"
+      :products="product.data.related_products"
+    />
   </div>
 </template>
 <style src="@/assets/scss/product.scss" scoped></style>

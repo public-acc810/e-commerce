@@ -30,7 +30,6 @@ const accountItems = ref([
 ]);
 // 👉 Methods
 const toggle = (event: any) => {
-  console.log(auth.isAuth);
   if (auth.isAuth) {
     menu.value.toggle(event);
   } else navigateTo("/auth/sign-in");

@@ -1,3 +1,7 @@
+<script setup>
+// 👉 Props
+const props = defineProps(["products"]);
+</script>
 <template>
   <UiMainSwiper
     title="Related products"
@@ -5,10 +9,10 @@
     className="related-product-swiper"
     :slides-per-view="3"
     :space-between="24"
-    :items="[1, 2, 3, 4, 5]"
+    :items="products"
   >
     <template #default="{ item, index }">
-      <ProductCard />
+      <ProductCard :product="item" />
     </template>
   </UiMainSwiper>
 </template>

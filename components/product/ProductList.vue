@@ -1,9 +1,9 @@
 <script setup>
 // 👉 Props
 const props = defineProps(["products"]);
-// 👉 Emits
-const emit = defineEmits(["getProducts"]);
 // 👉 Data
+const router = useRouter();
+const route = useRoute();
 const keyword = ref("");
 const selectedSort = ref(null);
 const sortedOptions = ref([
@@ -13,8 +13,11 @@ const sortedOptions = ref([
   { name: "Top Rate", value: "top_rate" },
 ]);
 // 👉 Methods
-const fireGetProducts = () => {
-  emit("getProducts", { keyword: keyword.value, sorted: selectedSort.value });
+const getProductsbySearch = () => {
+  router.push({ query: { ...route.query, keyword: keyword.value } });
+};
+const getProductsbySort = () => {
+  router.push({ query: { ...route.query, sort: selectedSort.value } });
 };
 </script>
 <template>
@@ -25,7 +28,8 @@ const fireGetProducts = () => {
           v-model="keyword"
           placeholder="Search for anything..."
           class="py-3 px-4 text-sm font-medium w-full"
-          @input="fireGetProducts"
+          inputmode="search"
+          @input="getProductsbySearch"
         />
         <InputIcon class="pi pi-search text-main-color cursor-pointer" />
       </IconField>
@@ -41,7 +45,7 @@ const fireGetProducts = () => {
           :checkmark="true"
           pt:option:class="sort-option"
           pt:optionlabel:class="text-sm font-medium text-main-color"
-          @change="fireGetProducts"
+          @change="getProductsbySort"
         >
         </Select>
       </div>

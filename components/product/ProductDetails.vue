@@ -4,8 +4,10 @@ const props = defineProps(["product"]);
 // 👉 Data
 const authStore = useAuthStore();
 const qty = ref(0);
-const selectedColor = ref(props.product.colors[0].name);
 const selectedSize = ref("");
+const selectedColor = ref(
+  props.product.colors.length > 0 ? props.product.colors[0].name : null
+);
 const sizes = ref([
   { name: "M" },
   { name: "L" },
@@ -36,7 +38,7 @@ const sizes = ref([
       </p>
       <div class="grid grid-cols-2 gap-2 mt-3">
         <p class="text-font-color text-sm font-normal">
-          Sku: <span class="text-black font-semibold">A264671</span>
+          Sku: <span class="text-black font-semibold">{{ product.id }}</span>
         </p>
         <p class="text-font-color text-sm font-normal">
           Availability:
@@ -73,7 +75,10 @@ const sizes = ref([
       </div>
       <Divider />
       <div class="flex gap-5 mt-1">
-        <div class="flex-1 flex flex-col gap-2">
+        <div
+          class="flex-1 flex flex-col gap-2"
+          v-if="product.colors.length > 0"
+        >
           <label class="text-sm font-normal">Color</label>
           <div class="flex flex-wrap items-center gap-4">
             <RadioButton
@@ -106,7 +111,7 @@ const sizes = ref([
           showButtons
           buttonLayout="horizontal"
           :min="0"
-          max="100"
+          :max="100"
           fluid
           style="width: 160px"
           class="qty-input"
@@ -129,13 +134,6 @@ const sizes = ref([
         <div class="flex gap-1" v-if="authStore.isAuth">
           <i class="pi pi-heart text-main-color"></i>
           <p class="text-main-color text-sm font-medium">Add to Wishlist</p>
-        </div>
-        <div class="flex items-center gap-1">
-          <font-awesome
-            icon="fa-solid fa-ruler-horizontal"
-            class="text-main-color"
-          />
-          <p class="text-main-color text-sm font-medium">Size Chart</p>
         </div>
       </div>
     </div>
